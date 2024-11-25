@@ -6,11 +6,9 @@ exports.getTopicsMod = () => {
     FROM topics`
 
     const queryValues = []
-    
 
     return db.query(sqlQuery, queryValues)
     .then(({rows}) => {
-        console.log(rows)
         return rows
     })
 }
