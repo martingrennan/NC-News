@@ -1,8 +1,6 @@
 # Northcoders News API
 
-For instructions, please head over to [L2C NC News](https://l2c.northcoders.com/courses/be/nc-news).
-
-
+Edit the README.md to remove the link to the initial instructions. Replace this with instructions on how to create the environment variables for anyone who wishes to clone your project and run it locally.
 
 --- 
 
