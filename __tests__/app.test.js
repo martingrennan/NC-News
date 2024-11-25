@@ -36,11 +36,6 @@ describe("GET /api/topics", () => {
       })
     })
   })
-  test('404: returns a 404 error if path is incorrect', () => {
-    return request(app)
-    .get("/api/topis")
-    .expect(404)
-  })
 })
 
 describe("GET /api/articles/article_id", () => {
@@ -86,10 +81,14 @@ describe("GET /api/articles/article_id", () => {
       })
     })
   })
-  test('404: returns a 404 error if path is incorrect', () => {
+  test('404: returns a 404 error if making a request for a non-exisent resource', () => {
     return request(app)
-    .get("/api/articl")
+    .get("/api/articles/99999")
     .expect(404)
+    .then(({body}) => {
+      const {msg} = body;
+      expect(msg).toBe('Article not found')
+    })
   })
   test('400: returns a 400 error if there is a bad request in path', () => {
     return request(app)
@@ -157,13 +156,33 @@ describe("GET /api/articles/:article_id/comments", () => {
       })
     })
   })
-  test('400: returns a 400 error if there is a bad request in path', () => {
+  test('404: returns a 404 error if making a request for a non-exisent resource', () => {
     return request(app)
-    .get("/api/articles/banana/comments")
-    .expect(400)
+    .get("/api/articles/5000/comments")
+    .expect(404)
     .then(({body}) => {
       const {msg} = body;
-      expect(msg).toBe('bad request')
+      expect(msg).toBe('Article not found')
     })
   })
+})
+
+describe('POST /api/articles/:article_id/comments', () => {
+  test('201: Allows a user to add a comment about an article ', () => {
+      const newComment = {
+          username: "MartinGrennan",
+          body: "comment comment comment comment comment"
+      }
+
+      return request(app)
+      .post("/api/articles/3/comments")
+      .send(newComment)
+      .expect(201)
+      .then(({body}) => {
+          expect(body.comment).toMatchObject({
+          username: "MartinGrennan",
+          body: "comment comment comment comment comment"
+          })
+      })
+   })
 })

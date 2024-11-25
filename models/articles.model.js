@@ -12,6 +12,9 @@ exports.getArticlesByIDMod = (article_id) => {
 
   return db.query(sqlQuery, queryValues)
   .then(({ rows }) => {
+    if (rows.length === 0){
+        throw { status: 404, msg: 'Article not found' }  
+    }
     return rows;
   });
 };
@@ -40,6 +43,9 @@ exports.getArticlesMod = (sort_by) => {
 
   return db.query(sqlQuery, queryValues)
   .then(({ rows }) => {
+    if (rows.length === 0){
+        throw { status: 404, msg: 'Article not found' }  
+    }
     return rows;
   });
 };
@@ -59,6 +65,30 @@ exports.getCommentsMod = (article_id) => {
 
     return db.query(sqlQuery, queryValues)
     .then(({ rows }) => {
+        if (rows.length === 0){
+            throw { status: 404, msg: 'Article not found' }  
+        }
         return rows;
      });
 };
+
+exports.postCommentsMod = (comment, endpoint) => {
+
+    const {username, body} = comment
+
+    console.log(username)
+    console.log(body)
+    console.log(endpoint.article_id)
+
+
+
+    return db.query(
+        `INSERT INTO comments (article_id, username, body) 
+        VALUES ($1, $2, $3) 
+        RETURNING*`,
+        [endpoint.article_id, username, body])
+    .then(({rows}) => {
+    console.log(rows[0])
+    return rows[0]
+    })
+}
