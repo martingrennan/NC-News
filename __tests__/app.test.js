@@ -103,7 +103,7 @@ describe("GET /api/articles/article_id", () => {
 })
 
 describe("GET /api/articles", () => {
-  test.only('200: returns an array of all articles sorted by date', () => {
+  test('200: returns an array of all articles sorted by date', () => {
     return request(app)
     .get("/api/articles?sort_by=created_at")
     .expect(200)
@@ -128,6 +128,38 @@ describe("GET /api/articles", () => {
   test('400: returns a 400 error if there is a bad request in path', () => {
     return request(app)
     .get("/api/articles?sort_by=hello")
+    .expect(400)
+    .then(({body}) => {
+      const {msg} = body;
+      expect(msg).toBe('bad request')
+    })
+  })
+})
+
+describe("GET /api/articles/:article_id/comments", () => {
+  test('200: returns an array of all comments related to a particular article, sorted by date', () => {
+    return request(app)
+    .get('/api/articles/1/comments')
+    .expect(200)
+    .then(({body}) => {
+        const { comments } = body;
+        expect(comments).toHaveLength(11);
+        expect(comments).toBeSortedBy('created_at')
+        comments.forEach((obj) => {
+            expect(obj).toMatchObject({
+                author: expect.any(String),
+                article_id: expect.any(Number),
+                body: expect.any(String),
+                created_at: expect.any(String),
+                votes: expect.any(Number),
+                comment_id: expect.any(Number)
+        })
+      })
+    })
+  })
+  test('400: returns a 400 error if there is a bad request in path', () => {
+    return request(app)
+    .get("/api/articles/banana/comments")
     .expect(400)
     .then(({body}) => {
       const {msg} = body;
