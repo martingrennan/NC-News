@@ -101,3 +101,37 @@ describe("GET /api/articles/article_id", () => {
     })
   })
 })
+
+describe("GET /api/articles", () => {
+  test.only('200: returns an array of all articles sorted by date', () => {
+    return request(app)
+    .get("/api/articles?sort_by=created_at")
+    .expect(200)
+    .then(({body}) => {
+        const { articles } = body;
+        expect(articles).toHaveLength(13);
+        expect(articles).toBeSortedBy('created_at')
+        articles.forEach((obj) => {
+            expect(obj).toMatchObject({
+                author: expect.any(String),
+                title: expect.any(String),
+                article_id: expect.any(Number),
+                topic: expect.any(String),
+                created_at: expect.any(String),
+                votes: expect.any(Number),
+                article_img_url: expect.any(String),
+                comment_count: expect.any(String)
+        })
+      })
+    })
+  })
+  test('400: returns a 400 error if there is a bad request in path', () => {
+    return request(app)
+    .get("/api/articles?sort_by=hello")
+    .expect(400)
+    .then(({body}) => {
+      const {msg} = body;
+      expect(msg).toBe('bad request')
+    })
+  })
+})
