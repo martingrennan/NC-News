@@ -1,48 +1,64 @@
-const db = require('../db/connection')
+const db = require("../db/connection");
 
 exports.getArticlesByIDMod = (article_id) => {
+  let sqlQuery = `SELECT *
+    FROM articles `;
+  const queryValues = [];
 
-    let sqlQuery = `SELECT *
-    FROM articles `
-    const queryValues = []
+  if (article_id) {
+    sqlQuery += `WHERE article_id = $1`;
+    queryValues.push(article_id);
+  }
 
-    if (article_id) {
-        sqlQuery += `WHERE article_id = $1`;
-        queryValues.push(article_id)
-    }
-
-    return db.query(sqlQuery, queryValues)
-    .then(({rows}) => {
-        return rows
-    })
-}
+  return db.query(sqlQuery, queryValues)
+  .then(({ rows }) => {
+    return rows;
+  });
+};
 
 exports.getArticlesMod = (sort_by) => {
-    const validSortBy = ['created_at']
-    const queryValues = []
+  const validSortBy = ["created_at"];
+  const queryValues = [];
 
-    if (sort_by && !validSortBy.includes(sort_by)) {
-        console.log('promise rejected')
-        return Promise.reject({ status: 400, msg: 'bad request'})
-    }
+  if (sort_by && !validSortBy.includes(sort_by)) {
+    return Promise.reject({ status: 400, msg: "bad request" });
+  }
 
-    let sqlQuery = 
-    `SELECT articles.author, articles.title, articles.article_id, articles.topic, articles.created_at, articles.article_img_url, articles.votes,
+  let sqlQuery = `SELECT articles.author, articles.title, articles.article_id, articles.topic, articles.created_at, articles.article_img_url, articles.votes,
     COUNT(comments.comment_id) AS comment_count
     FROM articles 
     LEFT JOIN comments 
     ON articles.article_id = comments.article_id
-    GROUP BY articles.article_id`
+    GROUP BY articles.article_id`;
 
-    //now get rid of body ^^^
-    //get comment_count
+  //now get rid of body ^^^
+  //get comment_count
 
-    if (sort_by) {
-        sqlQuery += ` ORDER BY ${sort_by} ASC` 
-    }
+  if (sort_by) {
+    sqlQuery += ` ORDER BY ${sort_by} ASC`;
+  }
+
+  return db.query(sqlQuery, queryValues)
+  .then(({ rows }) => {
+    return rows;
+  });
+};
+
+exports.getCommentsMod = (article_id) => {
+    let sqlQuery = 
+    `SELECT *
+    FROM comments `;
+    const queryValues = [];
+
+    if (article_id) {
+        sqlQuery += `WHERE article_id = $1`;
+        queryValues.push(article_id);
+      }
+
+    sqlQuery += ` ORDER BY created_at ASC`
 
     return db.query(sqlQuery, queryValues)
-    .then(({rows}) => {
-        return rows
-    })
-}
+    .then(({ rows }) => {
+        return rows;
+     });
+};
