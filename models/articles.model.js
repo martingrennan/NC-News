@@ -1,4 +1,5 @@
 const db = require("../db/connection");
+const { convertTimestampToDate } = require("../db/seeds/utils");
 
 exports.getArticlesByIDMod = (article_id) => {
   let sqlQuery = `SELECT *
@@ -65,30 +66,31 @@ exports.getCommentsMod = (article_id) => {
 
     return db.query(sqlQuery, queryValues)
     .then(({ rows }) => {
-        if (rows.length === 0){
-            throw { status: 404, msg: 'Article not found' }  
-        }
         return rows;
      });
 };
 
+exports.checkArticleExists = (article_id) => {
+  return db.query(`SELECT * FROM articles WHERE article_id = $1`, [article_id])
+  .then(({rows}) => {
+    if(!rows.length) {
+      return Promise.reject({ status: 404, msg: 'not found'})
+    }
+  })
+}
+
 exports.postCommentsMod = (comment, endpoint) => {
 
-    const {username, body} = comment
+    const {author, body} = comment
+    const id = Number(endpoint)
 
-    console.log(username)
-    console.log(body)
-    console.log(endpoint.article_id)
-
-
-
-    return db.query(
-        `INSERT INTO comments (article_id, username, body) 
-        VALUES ($1, $2, $3) 
-        RETURNING*`,
-        [endpoint.article_id, username, body])
+    return db.query(`INSERT INTO comments
+      (article_id, author, body) 
+      VALUES ($1, $2, $3) 
+      RETURNING *`, 
+      [id, author, body])
     .then(({rows}) => {
-    console.log(rows[0])
-    return rows[0]
+      // console.log(rows[0])
+            return rows[0]
     })
 }

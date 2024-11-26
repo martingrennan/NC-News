@@ -156,13 +156,22 @@ describe("GET /api/articles/:article_id/comments", () => {
       })
     })
   })
+  test('200: returns 200 if making request for article that exists but has no comments', () => {
+    return request(app)
+    .get('/api/articles/2/comments')
+    .expect(200)
+    .then(({body}) => {
+      const {comments} = body
+      expect(comments).toEqual([])
+    })
+  })
   test('404: returns a 404 error if making a request for a non-exisent resource', () => {
     return request(app)
     .get("/api/articles/5000/comments")
     .expect(404)
     .then(({body}) => {
       const {msg} = body;
-      expect(msg).toBe('Article not found')
+      expect(msg).toBe('not found')
     })
   })
 })
@@ -170,19 +179,40 @@ describe("GET /api/articles/:article_id/comments", () => {
 describe('POST /api/articles/:article_id/comments', () => {
   test('201: Allows a user to add a comment about an article ', () => {
       const newComment = {
-          username: "MartinGrennan",
-          body: "comment comment comment comment comment"
-      }
-
+          author: "rogersop",
+          body: "comment comment comment comment comment",
+      };
       return request(app)
-      .post("/api/articles/3/comments")
+      .post('/api/articles/3/comments')
       .send(newComment)
       .expect(201)
       .then(({body}) => {
-          expect(body.comment).toMatchObject({
-          username: "MartinGrennan",
-          body: "comment comment comment comment comment"
-          })
+        expect(body.comment).toEqual(
+          expect.objectContaining(
+            {
+              comment_id: 19,
+              body: 'comment comment comment comment comment',
+              article_id: 3,
+              author: 'rogersop',
+              votes: 0,
+              created_at: expect.any(String)
+            }
+          )
+        )
       })
    })
+   test('404: throws an error when posting to an article that doesnt exist', () => {
+    const newComment = {
+        author: "rogersop",
+        body: "comment comment comment comment comment",
+    };
+    return request(app)
+    .post('/api/articles/5000/comments')
+    .send(newComment)
+    .expect(400)
+    .then(({body}) => {
+      const {msg} = body;
+      expect(msg).toBe('bad request')
+    })
+ })
 })
