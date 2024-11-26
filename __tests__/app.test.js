@@ -102,7 +102,7 @@ describe("GET /api/articles/article_id", () => {
 })
 
 describe("GET /api/articles", () => {
-  test('200: returns an array of all articles sorted by date', () => {
+  test('200: returns an array of all articles sorted by date and not to have body property', () => {
     return request(app)
     .get("/api/articles?sort_by=created_at")
     .expect(200)
@@ -111,6 +111,51 @@ describe("GET /api/articles", () => {
         expect(articles).toHaveLength(13);
         expect(articles).toBeSortedBy('created_at')
         articles.forEach((obj) => {
+            expect(obj).toMatchObject({
+                author: expect.any(String),
+                title: expect.any(String),
+                article_id: expect.any(Number),
+                topic: expect.any(String),
+                created_at: expect.any(String),
+                votes: expect.any(Number),
+                article_img_url: expect.any(String),
+                comment_count: expect.any(String)
+        })
+      })
+    })
+  })
+  test('200: returns an array of all articles sorted by date DESCENDING and not to have body property', () => {
+    return request(app)
+    .get("/api/articles?sort_by=created_at&order=DESC")
+    .expect(200)
+    .then(({body}) => {
+        const { articles } = body;
+        expect(articles).toHaveLength(13);
+        expect(articles).toBeSortedBy('created_at', {descending: true} )
+        articles.forEach((obj) => {
+            expect(obj).toMatchObject({
+                author: expect.any(String),
+                title: expect.any(String),
+                article_id: expect.any(Number),
+                topic: expect.any(String),
+                created_at: expect.any(String),
+                votes: expect.any(Number),
+                article_img_url: expect.any(String),
+                comment_count: expect.any(String)
+        })
+      })
+    })
+  })
+  test('200: returns an array of all articles sorted by author and not to have body property', () => {
+    return request(app)
+    .get("/api/articles?sort_by=author")
+    .expect(200)
+    .then(({body}) => {
+        const { articles } = body;
+        expect(articles).toHaveLength(13);
+        expect(articles).toBeSortedBy('author')
+        articles.forEach((obj) => {
+          expect(obj).not.toHaveProperty('body')
             expect(obj).toMatchObject({
                 author: expect.any(String),
                 title: expect.any(String),

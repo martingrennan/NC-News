@@ -19,9 +19,15 @@ exports.getArticlesByIDMod = (article_id) => {
   });
 };
 
-exports.getArticlesMod = (sort_by) => {
-  const validSortBy = ["created_at"];
+exports.getArticlesMod = (sort_by, order) => {
+  const validSortBy = ["author", "title", "article_id", "topic",
+                       "created_at", "article_img_url", "votes", 
+                       "comment_count"];
   const queryValues = [];
+
+  if (!order){
+    order = 'ASC'
+  }
 
   if (sort_by && !validSortBy.includes(sort_by)) {
     return Promise.reject({ status: 400, msg: "bad request" });
@@ -34,11 +40,8 @@ exports.getArticlesMod = (sort_by) => {
     ON articles.article_id = comments.article_id
     GROUP BY articles.article_id`;
 
-  //now get rid of body ^^^
-  //get comment_count
-
   if (sort_by) {
-    sqlQuery += ` ORDER BY ${sort_by} ASC`;
+    sqlQuery += ` ORDER BY ${sort_by} ${order}`;
   }
 
   return db.query(sqlQuery, queryValues)
