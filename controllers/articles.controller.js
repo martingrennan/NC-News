@@ -1,9 +1,10 @@
 const { getArticlesByIDMod, 
-    getArticlesMod, 
-    getCommentsMod, 
-    postCommentsMod, 
-    checkArticleExists,
-    updateVotesMod } = require("../models/articles.model.js");
+        getArticlesMod, 
+        getCommentsMod, 
+        postCommentsMod, 
+        checkArticleExists,
+        updateVotesMod,
+        deleteCommentMod } = require("../models/articles.model.js");
 
 exports.getArticlesByIDCon = (req, res, next) => {
     const {article_id} = req.params
@@ -69,4 +70,14 @@ exports.updateVotesCon = (req, res, next) => {
     })
     .catch((next))
 
+}
+
+exports.deleteCommentCon = (req, res, next) => {
+    const endpoint = req.params.comment_id
+    deleteCommentMod(endpoint)
+    .then(() => {
+        console.log('inside promise.all')
+        res.status(204).send()
+    })
+    .catch((next))
 }
