@@ -94,3 +94,22 @@ exports.postCommentsMod = (comment, endpoint) => {
             return rows[0]
     })
 }
+
+exports.updateVotesMod = (votes, endpoint) => {
+    const id = Number(endpoint)
+    const voteCount = Number(votes.inc_votes)
+
+    console.log(voteCount)
+    // console.log(id)
+
+    return db.query(
+      `UPDATE articles
+      SET votes = votes + $1
+      WHERE article_id = $2
+      RETURNING*`,
+      [voteCount, id]
+    )
+    .then(({rows}) => {
+            return rows[0]
+  })
+}
