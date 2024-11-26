@@ -10,7 +10,6 @@ exports.getUsersMod = () => {
     if (rows.length === 0){
         throw { status: 404, msg: 'Article not found' }  
     }
-    console.log(rows)
     return rows;
   });
 }
