@@ -79,6 +79,18 @@ exports.checkArticleExists = (article_id) => {
   })
 }
 
+exports.checkCommentExists = (comment_id) => {
+  return db.query(`SELECT * 
+    FROM comments 
+    WHERE comment_id = $1`, 
+    [comment_id])
+  .then(({rows}) => {
+    if(!rows.length) {
+      return Promise.reject({ status: 404, msg: 'not found'})
+    }
+  })
+}
+
 exports.postCommentsMod = (comment, endpoint) => {
 
     const {author, body} = comment
@@ -99,7 +111,7 @@ exports.updateVotesMod = (votes, endpoint) => {
     const id = Number(endpoint)
     const voteCount = Number(votes.inc_votes)
 
-    console.log(voteCount)
+    // console.log(voteCount)
     // console.log(id)
 
     return db.query(
@@ -111,5 +123,18 @@ exports.updateVotesMod = (votes, endpoint) => {
     )
     .then(({rows}) => {
             return rows[0]
+  })
+}
+
+exports.deleteCommentMod = (endpoint) => {
+  return db.query(
+    `DELETE FROM comments
+    WHERE comment_id = $1
+    RETURNING *`,
+    [endpoint]
+  ).then(({rows}) => {
+    if (rows.length === 0){
+      return Promise.reject({status: 404, msg: 'not found'})
+    }
   })
 }

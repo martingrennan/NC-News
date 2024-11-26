@@ -287,3 +287,29 @@ describe('PATCH /api/articles/:article_id', () => {
   })
 })
 })
+
+describe('DELETE /api/comments/:comment_id', () => {
+  test('204: Allows a user to delete a comment', () => {
+      return request(app)
+      .delete('/api/comments/5')
+      .expect(204)
+   })
+   test('404: throws an error when trying to delete to an article that doesnt exist', () => {
+    return request(app)
+    .delete('/api/comments/5000')
+    .expect(404)
+    .then(({body}) => {
+      const {msg} = body;
+      expect(msg).toBe('not found')
+    }) 
+ })
+ test('400: throws an error when trying to input bad request', () => {
+  return request(app)
+  .delete('/api/comments/hello')
+  .expect(400)
+  .then(({body}) => {
+    const {msg} = body;
+    expect(msg).toBe('bad request')
+  })
+})
+})

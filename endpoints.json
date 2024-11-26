@@ -73,7 +73,20 @@
   "PATCH /api/articles/:article_id": {
     "description": "updates votes count on an article",
     "exampleResponse":{
-
+      "title": "Living in the shadow of a great man",
+      "topic": "mitch",
+      "author": "butter_bridge",
+      "body": "I find this existence challenging",
+      "created_at": "expect.any(String)",
+      "votes": "200",
+      "article_img_url":
+        "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700"
+    }
+  },
+  "DELETE /api/comments/:comment_id": {
+    "description": "deletes a comment using parameter to match comment_id",
+    "exampleResponse":{
+     "status": "204"
     }
   }
 }
