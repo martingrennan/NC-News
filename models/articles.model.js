@@ -1,5 +1,4 @@
 const db = require("../db/connection");
-const { convertTimestampToDate } = require("../db/seeds/utils");
 
 exports.getArticlesByIDMod = (article_id) => {
   let sqlQuery = `SELECT *

@@ -7,6 +7,7 @@ const { getArticlesByIDCon,
         postCommentsCon, 
         updateVotesCon,
         deleteCommentCon} = require("./controllers/articles.controller")
+const { getUsersCon } = require("./controllers/users.controller")
 const app = express()
 
 app.use(express.json())
@@ -26,6 +27,8 @@ app.post('/api/articles/:article_id/comments', postCommentsCon)
 app.patch('/api/articles/:article_id', updateVotesCon)
 
 app.delete('/api/comments/:comment_id', deleteCommentCon)
+
+app.get('/api/users', getUsersCon)
 
 
 app.use((err, req, res, next) => {

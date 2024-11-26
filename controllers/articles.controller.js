@@ -76,7 +76,6 @@ exports.deleteCommentCon = (req, res, next) => {
     const endpoint = req.params.comment_id
     deleteCommentMod(endpoint)
     .then(() => {
-        console.log('inside promise.all')
         res.status(204).send()
     })
     .catch((next))
