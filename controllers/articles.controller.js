@@ -1,4 +1,9 @@
-const { getArticlesByIDMod, getArticlesMod, getCommentsMod, postCommentsMod, checkArticleExists } = require("../models/articles.model.js");
+const { getArticlesByIDMod, 
+    getArticlesMod, 
+    getCommentsMod, 
+    postCommentsMod, 
+    checkArticleExists,
+    updateVotesMod } = require("../models/articles.model.js");
 
 exports.getArticlesByIDCon = (req, res, next) => {
     const {article_id} = req.params
@@ -46,4 +51,22 @@ exports.postCommentsCon = (req, res, next) => {
         res.status(201).send({comment})
     })
     .catch((next))
+}
+
+exports.updateVotesCon = (req, res, next) => {
+    const votes = req.body
+    const endpoint = req.params.article_id
+    const promises = [updateVotesMod(votes, endpoint)]
+
+    if (endpoint){
+        promises.push(checkArticleExists(endpoint))
+    }
+
+
+    Promise.all(promises)
+    .then(([votes]) => {
+        res.status(200).send({votes})
+    })
+    .catch((next))
+
 }

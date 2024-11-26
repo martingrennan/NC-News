@@ -58,5 +58,22 @@
         }
       ]
     }
+  },
+  "POST /api/articles/article_id/comments": {
+    "description": "adds a comment to an article",
+    "exampleResponse":{
+      "comment_id": "19",
+      "body": "'comment comment comment comment comment'",
+      "article_id": "3",
+      "author": "rogersop",
+      "votes": "0",
+      "created_at": "expect.any(String)"
+    }
+  },
+  "PATCH /api/articles/:article_id": {
+    "description": "updates votes count on an article",
+    "exampleResponse":{
+
+    }
   }
 }

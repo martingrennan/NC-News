@@ -1,7 +1,11 @@
 const express = require("express")
 const { getApi } = require("./controllers/api.controller")
 const { getTopicsCon } = require("./controllers/topics.controller")
-const { getArticlesByIDCon, getArticlesCon, getCommentsCon, postCommentsCon } = require("./controllers/articles.controller")
+const { getArticlesByIDCon, 
+    getArticlesCon, 
+    getCommentsCon, 
+    postCommentsCon, 
+    updateVotesCon } = require("./controllers/articles.controller")
 const { errorMonitor } = require("supertest/lib/test")
 const app = express()
 
@@ -18,6 +22,8 @@ app.get('/api/articles', getArticlesCon)
 app.get('/api/articles/:article_id/comments', getCommentsCon)
 
 app.post('/api/articles/:article_id/comments', postCommentsCon)
+
+app.patch('/api/articles/:article_id', updateVotesCon)
 
 app.use((err, req, res, next) => {
     // console.log(err)

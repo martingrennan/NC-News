@@ -201,7 +201,7 @@ describe('POST /api/articles/:article_id/comments', () => {
         )
       })
    })
-   test('404: throws an error when posting to an article that doesnt exist', () => {
+   test('400: throws an error when posting to an article that doesnt exist', () => {
     const newComment = {
         author: "rogersop",
         body: "comment comment comment comment comment",
@@ -215,4 +215,75 @@ describe('POST /api/articles/:article_id/comments', () => {
       expect(msg).toBe('bad request')
     })
  })
+})
+
+describe('PATCH /api/articles/:article_id', () => {
+  test('200: Allows a user to update votes on an article POSITIVE NUMBER', () => {
+      const newVote = {inc_votes: 100};
+      return request(app)
+      .patch('/api/articles/1')
+      .send(newVote)
+      .expect(200)
+      .then(({body}) => {
+        expect(body.votes).toEqual(
+          expect.objectContaining(
+            {
+              title: "Living in the shadow of a great man",
+              topic: "mitch",
+              author: "butter_bridge",
+              body: "I find this existence challenging",
+              created_at: expect.any(String),
+              votes: 200,
+              article_img_url:
+                "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+            },
+          )
+        )
+      })
+   })
+   test('200: Allows a user to update votes on an article NEGATIVE NUMBER', () => {
+    const newVote = {inc_votes: -100};
+    return request(app)
+    .patch('/api/articles/1')
+    .send(newVote)
+    .expect(200)
+    .then(({body}) => {
+      expect(body.votes).toEqual(
+        expect.objectContaining(
+          {
+            title: "Living in the shadow of a great man",
+            topic: "mitch",
+            author: "butter_bridge",
+            body: "I find this existence challenging",
+            created_at: expect.any(String),
+            votes: 0,
+            article_img_url:
+              "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+          },
+        )
+      )
+    })
+ })
+   test('404: throws an error when posting to an article that doesnt exist', () => {
+    const newVote = {inc_votes: 100};
+    return request(app)
+    .patch('/api/articles/5000')
+    .send(newVote)
+    .expect(404)
+    .then(({body}) => {
+      const {msg} = body;
+      expect(msg).toBe('not found')
+    })
+ })
+ test('400: throws an error when passing in an invalid vote count', () => {
+  const newVote = {inc_votes: 'HELLO'};
+  return request(app)
+  .patch('/api/articles/5000')
+  .send(newVote)
+  .expect(400)
+  .then(({body}) => {
+    const {msg} = body;
+    expect(msg).toBe('bad request')
+  })
+})
 })
