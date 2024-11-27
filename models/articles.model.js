@@ -1,14 +1,21 @@
 const db = require("../db/connection");
 
 exports.getArticlesByIDMod = (article_id) => {
-  let sqlQuery = `SELECT *
-    FROM articles `;
+  let sqlQuery = 
+  `SELECT articles.*, 
+  COUNT(comments.comment_id) AS comment_count
+  FROM articles
+  LEFT JOIN comments
+  ON articles.article_id = comments.article_id `;
   const queryValues = [];
 
   if (article_id) {
-    sqlQuery += `WHERE article_id = $1`;
+    sqlQuery += ` WHERE articles.article_id = $1`; //$1
     queryValues.push(article_id);
   }
+
+  sqlQuery += 
+  ` GROUP BY articles.article_id;`
 
   return db.query(sqlQuery, queryValues)
   .then(({ rows }) => {
