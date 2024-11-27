@@ -169,6 +169,59 @@ describe("GET /api/articles", () => {
       })
     })
   })
+  test('200: returns an array of all articles filtered by topic MITCH and not to have body property', () => {
+    return request(app)
+    .get("/api/articles?topic=mitch")
+    .expect(200)
+    .then(({body}) => {
+        const { articles } = body;
+        expect(articles).toHaveLength(12);
+        articles.forEach((obj) => {
+          expect(obj).not.toHaveProperty('body')
+            expect(obj).toMatchObject({
+                author: expect.any(String),
+                title: expect.any(String),
+                article_id: expect.any(Number),
+                topic: 'mitch',
+                created_at: expect.any(String),
+                votes: expect.any(Number),
+                article_img_url: expect.any(String),
+                comment_count: expect.any(String)
+        })
+      })
+    })
+  })
+  test('200: returns an array of all articles filtered by topic CATS and not to have body property', () => {
+    return request(app)
+    .get("/api/articles?topic=cats")
+    .expect(200)
+    .then(({body}) => {
+        const { articles } = body;
+        expect(articles).toHaveLength(1);
+        articles.forEach((obj) => {
+          expect(obj).not.toHaveProperty('body')
+            expect(obj).toMatchObject({
+                author: expect.any(String),
+                title: expect.any(String),
+                article_id: expect.any(Number),
+                topic: 'cats',
+                created_at: expect.any(String),
+                votes: expect.any(Number),
+                article_img_url: expect.any(String),
+                comment_count: expect.any(String)
+        })
+      })
+    })
+  })
+  test('404: returns an error when searching for an invalid endpoint', () => {
+    return request(app)
+    .get("/api/articles?topic=cat")
+    .expect(404)
+    .then(({body}) => {
+      const {msg} = body;
+      expect(msg).toBe('Article not found')
+    })
+  })
   test('400: returns a 400 error if there is a bad request in path', () => {
     return request(app)
     .get("/api/articles?sort_by=hello")

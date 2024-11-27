@@ -19,7 +19,7 @@ exports.getArticlesByIDMod = (article_id) => {
   });
 };
 
-exports.getArticlesMod = (sort_by, order) => {
+exports.getArticlesMod = (sort_by="created_at", order, topic) => {
   const validSortBy = ["author", "title", "article_id", "topic",
                        "created_at", "article_img_url", "votes", 
                        "comment_count"];
@@ -35,9 +35,15 @@ exports.getArticlesMod = (sort_by, order) => {
 
   let sqlQuery = `SELECT articles.author, articles.title, articles.article_id, articles.topic, articles.created_at, articles.article_img_url, articles.votes,
     COUNT(comments.comment_id) AS comment_count
-    FROM articles 
-    LEFT JOIN comments 
-    ON articles.article_id = comments.article_id
+    FROM articles LEFT JOIN comments 
+    ON articles.article_id = comments.article_id`
+
+  if (topic) {
+      sqlQuery += ` WHERE topic = $1 `
+      queryValues.push(topic)
+   }
+    
+  sqlQuery += `
     GROUP BY articles.article_id`;
 
   if (sort_by) {
@@ -71,27 +77,6 @@ exports.getCommentsMod = (article_id) => {
         return rows;
      });
 };
-
-exports.checkArticleExists = (article_id) => {
-  return db.query(`SELECT * FROM articles WHERE article_id = $1`, [article_id])
-  .then(({rows}) => {
-    if(!rows.length) {
-      return Promise.reject({ status: 404, msg: 'not found'})
-    }
-  })
-}
-
-exports.checkCommentExists = (comment_id) => {
-  return db.query(`SELECT * 
-    FROM comments 
-    WHERE comment_id = $1`, 
-    [comment_id])
-  .then(({rows}) => {
-    if(!rows.length) {
-      return Promise.reject({ status: 404, msg: 'not found'})
-    }
-  })
-}
 
 exports.postCommentsMod = (comment, endpoint) => {
 
@@ -137,6 +122,27 @@ exports.deleteCommentMod = (endpoint) => {
   ).then(({rows}) => {
     if (rows.length === 0){
       return Promise.reject({status: 404, msg: 'not found'})
+    }
+  })
+}
+
+exports.checkArticleExists = (article_id) => {
+  return db.query(`SELECT * FROM articles WHERE article_id = $1`, [article_id])
+  .then(({rows}) => {
+    if(!rows.length) {
+      return Promise.reject({ status: 404, msg: 'not found'})
+    }
+  })
+}
+
+exports.checkCommentExists = (comment_id) => {
+  return db.query(`SELECT * 
+    FROM comments 
+    WHERE comment_id = $1`, 
+    [comment_id])
+  .then(({rows}) => {
+    if(!rows.length) {
+      return Promise.reject({ status: 404, msg: 'not found'})
     }
   })
 }
