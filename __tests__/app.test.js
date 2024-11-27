@@ -56,6 +56,7 @@ describe("GET /api/articles/article_id", () => {
                 created_at: expect.any(String),
                 votes: expect.any(Number),
                 article_img_url: expect.any(String),
+                comment_count: "11"
         })
       })
     })
@@ -77,6 +78,7 @@ describe("GET /api/articles/article_id", () => {
                 created_at: expect.any(String),
                 votes: expect.any(Number),
                 article_img_url: expect.any(String),
+                comment_count: "0"
         })
       })
     })
