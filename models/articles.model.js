@@ -30,14 +30,21 @@ exports.getArticlesMod = (sort_by="created_at", order, topic) => {
   const validSortBy = ["author", "title", "article_id", "topic",
                        "created_at", "article_img_url", "votes", 
                        "comment_count"];
+  const validOrder = ["ASC", "DESC"]
   const queryValues = [];
+
+
+
+  if (sort_by && !validSortBy.includes(sort_by)) {
+    return Promise.reject({ status: 400, msg: "bad request in sort by query" });
+  }
+
+  if (order && !validOrder.includes(order)) {
+    return Promise.reject({ status: 400, msg: "bad request in order query" });
+  }
 
   if (!order){
     order = 'ASC'
-  }
-
-  if (sort_by && !validSortBy.includes(sort_by)) {
-    return Promise.reject({ status: 400, msg: "bad request" });
   }
 
   let sqlQuery = `SELECT articles.author, articles.title, articles.article_id, articles.topic, articles.created_at, articles.article_img_url, articles.votes,
@@ -96,17 +103,13 @@ exports.postCommentsMod = (comment, endpoint) => {
       RETURNING *`, 
       [id, author, body])
     .then(({rows}) => {
-      // console.log(rows[0])
             return rows[0]
     })
 }
 
 exports.updateVotesMod = (votes, endpoint) => {
-    const id = Number(endpoint)
-    const voteCount = Number(votes.inc_votes)
-
-    // console.log(voteCount)
-    // console.log(id)
+    const id = endpoint
+    const voteCount = votes.inc_votes
 
     return db.query(
       `UPDATE articles

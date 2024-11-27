@@ -48,14 +48,14 @@ describe("GET /api/articles/article_id", () => {
         expect(articles).toHaveLength(1);
         articles.forEach((obj) => {
             expect(obj).toMatchObject({
-                author: expect.any(String),
-                title: expect.any(String),
-                article_id: expect.any(Number),
-                body: expect.any(String),
-                topic: expect.any(String),
+                author: 'butter_bridge',
+                title: 'Living in the shadow of a great man',
+                article_id: 1,
+                body: 'I find this existence challenging',
+                topic: 'mitch',
                 created_at: expect.any(String),
-                votes: expect.any(Number),
-                article_img_url: expect.any(String),
+                votes: 100,
+                article_img_url: 'https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700',
                 comment_count: "11"
         })
       })
@@ -126,14 +126,14 @@ describe("GET /api/articles", () => {
       })
     })
   })
-  test('200: returns an array of all articles sorted by date DESCENDING and not to have body property', () => {
+  test('200: returns an array of all articles sorted by votes DESCENDING', () => {
     return request(app)
-    .get("/api/articles?sort_by=created_at&order=DESC")
+    .get("/api/articles?sort_by=votes&order=DESC")
     .expect(200)
     .then(({body}) => {
         const { articles } = body;
         expect(articles).toHaveLength(13);
-        expect(articles).toBeSortedBy('created_at', {descending: true} )
+        expect(articles).toBeSortedBy('votes', {descending: true} )
         articles.forEach((obj) => {
             expect(obj).toMatchObject({
                 author: expect.any(String),
@@ -148,7 +148,7 @@ describe("GET /api/articles", () => {
       })
     })
   })
-  test('200: returns an array of all articles sorted by author and not to have body property', () => {
+  test('200: returns an array of all articles sorted by author', () => {
     return request(app)
     .get("/api/articles?sort_by=author")
     .expect(200)
@@ -171,7 +171,7 @@ describe("GET /api/articles", () => {
       })
     })
   })
-  test('200: returns an array of all articles filtered by topic MITCH and not to have body property', () => {
+  test('200: returns an array of all articles filtered by topic MITCH', () => {
     return request(app)
     .get("/api/articles?topic=mitch")
     .expect(200)
@@ -193,7 +193,7 @@ describe("GET /api/articles", () => {
       })
     })
   })
-  test('200: returns an array of all articles filtered by topic CATS and not to have body property', () => {
+  test('200: returns an array of all articles filtered by topic CATS', () => {
     return request(app)
     .get("/api/articles?topic=cats")
     .expect(200)
@@ -224,13 +224,22 @@ describe("GET /api/articles", () => {
       expect(msg).toBe('Article not found')
     })
   })
-  test('400: returns a 400 error if there is a bad request in path', () => {
+  test('400: returns a 400 error if there is a bad sort_by request in path', () => {
     return request(app)
     .get("/api/articles?sort_by=hello")
     .expect(400)
     .then(({body}) => {
       const {msg} = body;
-      expect(msg).toBe('bad request')
+      expect(msg).toBe('bad request in sort by query')
+    })
+  })
+  test('400: returns a 400 error if there is a bad sort_by request in path', () => {
+    return request(app)
+    .get("/api/articles?order=hello")
+    .expect(400)
+    .then(({body}) => {
+      const {msg} = body;
+      expect(msg).toBe('bad request in order query')
     })
   })
 })
@@ -247,7 +256,7 @@ describe("GET /api/articles/:article_id/comments", () => {
         comments.forEach((obj) => {
             expect(obj).toMatchObject({
                 author: expect.any(String),
-                article_id: expect.any(Number),
+                article_id: 1,
                 body: expect.any(String),
                 created_at: expect.any(String),
                 votes: expect.any(Number),
@@ -301,6 +310,7 @@ describe('POST /api/articles/:article_id/comments', () => {
         )
       })
    })
+   // THIS SHOULD BE 404 ERROR - problem with async operations/ Promise all?
    test('400: throws an error when posting to an article that doesnt exist', () => {
     const newComment = {
         author: "rogersop",
@@ -315,6 +325,48 @@ describe('POST /api/articles/:article_id/comments', () => {
       expect(msg).toBe('bad request')
     })
  })
+ test('400: throws an error when there is a bad request in path', () => {
+    const newComment = {
+        author: "rogersop",
+        body: "comment comment comment comment comment",
+    };
+    return request(app)
+    .post('/api/articles/banana/comments')
+    .send(newComment)
+    .expect(400)
+    .then(({body}) => {
+      const {msg} = body;
+      expect(msg).toBe('bad request')
+    })
+  })
+  test('400: throws an error when trying to post incomplete new comment', () => {
+    const newComment = {
+        author: "rogersop",
+        body: null,
+    };
+    return request(app)
+    .post('/api/articles/1/comments')
+    .send(newComment)
+    .expect(400)
+    .then(({body}) => {
+      const {msg} = body;
+      expect(msg).toBe('incomplete new comment')
+    })
+  })
+  test('400: throws an error when the author is invalid and not in database', () => {
+    const newComment = {
+        author: "roger",
+        body: "comment comment comment comment comment",
+    };
+    return request(app)
+    .post('/api/articles/1/comments')
+    .send(newComment)
+    .expect(400)
+    .then(({body}) => {
+      const {msg} = body;
+      expect(msg).toBe('bad request')
+    })
+  })
 })
 
 describe('PATCH /api/articles/:article_id', () => {
@@ -394,7 +446,7 @@ describe('DELETE /api/comments/:comment_id', () => {
       .delete('/api/comments/5')
       .expect(204)
    })
-   test('404: throws an error when trying to delete to an article that doesnt exist', () => {
+   test('404: throws an error when trying to delete to a comment that doesnt exist', () => {
     return request(app)
     .delete('/api/comments/5000')
     .expect(404)
@@ -403,7 +455,7 @@ describe('DELETE /api/comments/:comment_id', () => {
       expect(msg).toBe('not found')
     }) 
  })
- test('400: throws an error when trying to input bad request', () => {
+ test('400: throws an error when there is a bad request in path', () => {
   return request(app)
   .delete('/api/comments/hello')
   .expect(400)

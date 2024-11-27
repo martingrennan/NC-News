@@ -51,7 +51,11 @@ exports.postCommentsCon = (req, res, next) => {
     .then(([comment]) => {
         res.status(201).send({comment})
     })
-    .catch((next))
+    .catch((err) => {
+        // console.log('inside Promise all')
+        // console.log(err)
+        next(err)
+    })
 }
 
 exports.updateVotesCon = (req, res, next) => {

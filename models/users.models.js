@@ -8,7 +8,7 @@ exports.getUsersMod = () => {
   return db.query(sqlQuery, queryValues)
   .then(({ rows }) => {
     if (rows.length === 0){
-        throw { status: 404, msg: 'Article not found' }  
+        throw { status: 404, msg: 'User not found' }  
     }
     return rows;
   });

@@ -5,9 +5,7 @@ exports.getTopicsMod = () => {
     let sqlQuery = `SELECT *
     FROM topics`
 
-    const queryValues = []
-
-    return db.query(sqlQuery, queryValues)
+    return db.query(sqlQuery)
     .then(({rows}) => {
         return rows
     })
