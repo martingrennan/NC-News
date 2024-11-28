@@ -3,8 +3,11 @@ const { getArticlesByIDMod,
         getCommentsMod, 
         postCommentsMod, 
         checkArticleExists,
+        checkCommentExists,
         updateVotesMod,
-        deleteCommentMod } = require("../models/articles.model.js");
+        deleteCommentMod, 
+        updateCommentsMod,
+        deleteArticleMod} = require("../models/articles.model.js");
 
 exports.getArticlesByIDCon = (req, res, next) => {
     const {article_id} = req.params
@@ -79,6 +82,31 @@ exports.updateVotesCon = (req, res, next) => {
 exports.deleteCommentCon = (req, res, next) => {
     const endpoint = req.params.comment_id
     deleteCommentMod(endpoint)
+    .then(() => {
+        res.status(204).send()
+    })
+    .catch((next))
+}
+
+exports.updateCommentsCon = (req, res, next) => {
+    const votes = req.body
+    const endpoint = req.params.comment_id
+    const promises = [updateCommentsMod(votes, endpoint)]
+
+    if (endpoint){
+        promises.push(checkCommentExists(endpoint))
+    }
+
+    Promise.all(promises)
+    .then(([votes]) => {
+        res.status(200).send({votes})
+    })
+    .catch((next))
+}
+
+exports.deleteArticleCon = (req, res, next) => {
+    const endpoint = req.params.article_id
+    deleteArticleMod(endpoint)
     .then(() => {
         res.status(204).send()
     })
