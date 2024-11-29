@@ -21,7 +21,7 @@ Cloning:
     - Open the newly created directory and type 'code .' to open VS Code
 
 Install dependencies:
-    - 
+    - Running 'npm install' in the terminal will install all dependecies required to run this program
 
 Seed local database:
     - Type 'setup-dbs' in your terminal to initially seed the database

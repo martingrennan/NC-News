@@ -412,7 +412,7 @@ describe("POST /api/articles/:article_id/comments", () => {
       });
   });
   // THIS SHOULD BE 404 ERROR - problem with async operations/ Promise all?
-  test("400: throws an error when posting to an article that doesnt exist", () => {
+  test("404: throws an error when posting to an article that doesnt exist", () => {
     const newComment = {
       author: "rogersop",
       body: "comment comment comment comment comment",
@@ -420,10 +420,10 @@ describe("POST /api/articles/:article_id/comments", () => {
     return request(app)
       .post("/api/articles/5000/comments")
       .send(newComment)
-      .expect(400)
+      .expect(404)
       .then(({ body }) => {
         const { msg } = body;
-        expect(msg).toBe("bad request");
+        expect(msg).toBe("not found");
       });
   });
   test("400: throws an error when there is a bad request in path", () => {
@@ -454,7 +454,7 @@ describe("POST /api/articles/:article_id/comments", () => {
         expect(msg).toBe("incomplete entry");
       });
   });
-  test("400: throws an error when the author is invalid and not in database", () => {
+  test("404: throws an error when the author is invalid and not in database", () => {
     const newComment = {
       author: "roger",
       body: "comment comment comment comment comment",
@@ -462,10 +462,10 @@ describe("POST /api/articles/:article_id/comments", () => {
     return request(app)
       .post("/api/articles/1/comments")
       .send(newComment)
-      .expect(400)
+      .expect(404)
       .then(({ body }) => {
         const { msg } = body;
-        expect(msg).toBe("bad request");
+        expect(msg).toBe("not found");
       });
   });
 });
@@ -792,7 +792,7 @@ describe("POST /api/articles", () => {
         );
       });
   });
-  test("400: throws an error when trying to post incomplete new article", () => {
+  test("400 throws an error when trying to post incomplete new article", () => {
     const newArticle = {
       author: "rogersop",
       title: null,
@@ -809,7 +809,7 @@ describe("POST /api/articles", () => {
         expect(msg).toBe("incomplete entry");
       });
   });
-  test("400: throws an error when the author is invalid and not in database", () => {
+  test("404: throws an error when the author is invalid and not in database", () => {
     const newArticle = {
       author: "author not in database",
       title: "example title",
@@ -820,10 +820,10 @@ describe("POST /api/articles", () => {
     return request(app)
       .post("/api/articles")
       .send(newArticle)
-      .expect(400)
+      .expect(404)
       .then(({ body }) => {
         const { msg } = body;
-        expect(msg).toBe("bad request");
+        expect(msg).toBe("not found");
       });
   });
 });
