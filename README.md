@@ -18,24 +18,24 @@ Cloning:\
     - Go to [Github](https://github.com/martingrennan/NC-News)\
     - Click the Code arrow and copy the HTTPS link\
     - Go to your terminal and type 'git clone [pasted HTTPS link]'\
-    - Open the newly created directory and type 'code .' to open VS Code\
+    - Open the newly created directory and type 'code .' to open VS Code
 
 Install dependencies:\
     - Running 'npm install' in the terminal will install all dependecies required to run this program\
 
 Seed local database:\
-    - Type 'setup-dbs' in your terminal to initially seed the database\
+    - Type 'setup-dbs' in your terminal to initially seed the database
 
 Run tests:\
     - Type 'npm run test' in your terminal to run all test suites\
-    - If you only want to run a specific test suite, type 'npm run test [example: app.test.js]'\
+    - If you only want to run a specific test suite, type 'npm run test [example: app.test.js]'
 
 
 # Creating .env files.
 
-In the root of the 'be-nc-news' folder, create:
-    1. '.env.development' - on line 1, type: 'PGDATABASE=nc_news'
-    2. '.env.test' - on line 1, type: 'PGDATABASE=nc_news_test'
+In the root of the 'be-nc-news' folder, create:\
+    1. '.env.development' - on line 1, type: 'PGDATABASE=nc_news'\
+    2. '.env.test' - on line 1, type: 'PGDATABASE=nc_news_test'\
 
 # Minimum versions required: 
 
