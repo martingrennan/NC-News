@@ -14,21 +14,21 @@ It has many different features at its core, it allows users to get topics, artic
 
 # How to clone, install dependencies, seed local database, and run tests.
 
-Cloning:
-    - Go to [Github](https://github.com/martingrennan/NC-News)
-    - Click the Code arrow and copy the HTTPS link
-    - Go to your terminal and type 'git clone [pasted HTTPS link]'
-    - Open the newly created directory and type 'code .' to open VS Code
+Cloning:\
+    - Go to [Github](https://github.com/martingrennan/NC-News)\
+    - Click the Code arrow and copy the HTTPS link\
+    - Go to your terminal and type 'git clone [pasted HTTPS link]'\
+    - Open the newly created directory and type 'code .' to open VS Code\
 
-Install dependencies:
-    - Running 'npm install' in the terminal will install all dependecies required to run this program
+Install dependencies:\
+    - Running 'npm install' in the terminal will install all dependecies required to run this program\
 
-Seed local database:
-    - Type 'setup-dbs' in your terminal to initially seed the database
+Seed local database:\
+    - Type 'setup-dbs' in your terminal to initially seed the database\
 
-Run tests:
-    - Type 'npm run test' in your terminal to run all test suites
-    - If you only want to run a specific test suite, type 'npm run test [example: app.test.js]'
+Run tests:\
+    - Type 'npm run test' in your terminal to run all test suites\
+    - If you only want to run a specific test suite, type 'npm run test [example: app.test.js]'\
 
 
 # Creating .env files.
