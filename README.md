@@ -35,7 +35,7 @@ Run tests:\
 
 In the root of the 'be-nc-news' folder, create:\
     1. '.env.development' - on line 1, type: 'PGDATABASE=nc_news'\
-    2. '.env.test' - on line 1, type: 'PGDATABASE=nc_news_test'\
+    2. '.env.test' - on line 1, type: 'PGDATABASE=nc_news_test'
 
 # Minimum versions required: 
 
