@@ -105,13 +105,13 @@ describe("GET /api/articles/article_id", () => {
 });
 
 describe("GET /api/articles", () => {
-  test("200: returns an array of all articles sorted by date and not to have body property", () => {
+  test("200: returns an array of all articles sorted by date and not to have body property, limited to 10 results by default", () => {
     return request(app)
       .get("/api/articles?sort_by=created_at")
       .expect(200)
       .then(({ body }) => {
         const { articles } = body;
-        expect(articles).toHaveLength(13);
+        expect(articles).toHaveLength(10);
         expect(articles).toBeSortedBy("created_at");
         articles.forEach((obj) => {
           expect(obj).toMatchObject({
@@ -133,7 +133,7 @@ describe("GET /api/articles", () => {
       .expect(200)
       .then(({ body }) => {
         const { articles } = body;
-        expect(articles).toHaveLength(13);
+        expect(articles).toHaveLength(10);
         expect(articles).toBeSortedBy("votes", { descending: true });
         articles.forEach((obj) => {
           expect(obj).toMatchObject({
@@ -155,7 +155,7 @@ describe("GET /api/articles", () => {
       .expect(200)
       .then(({ body }) => {
         const { articles } = body;
-        expect(articles).toHaveLength(13);
+        expect(articles).toHaveLength(10);
         expect(articles).toBeSortedBy("author");
         articles.forEach((obj) => {
           expect(obj).not.toHaveProperty("body");
@@ -178,7 +178,7 @@ describe("GET /api/articles", () => {
       .expect(200)
       .then(({ body }) => {
         const { articles } = body;
-        expect(articles).toHaveLength(12);
+        expect(articles).toHaveLength(10);
         articles.forEach((obj) => {
           expect(obj).not.toHaveProperty("body");
           expect(obj).toMatchObject({
@@ -216,6 +216,60 @@ describe("GET /api/articles", () => {
         });
       });
   });
+  test("200: returns an array of all articles sorted by date, limited to 3 results", () => {
+    return request(app)
+      .get("/api/articles?limit=3")
+      .expect(200)
+      .then(({ body }) => {
+        const { articles } = body;
+        expect(articles).toHaveLength(3);
+        expect(articles).toBeSortedBy("created_at");
+        articles.forEach((obj) => {
+          expect(obj).toMatchObject({
+            author: expect.any(String),
+            title: expect.any(String),
+            article_id: expect.any(Number),
+            topic: expect.any(String),
+            created_at: expect.any(String),
+            votes: expect.any(Number),
+            article_img_url: expect.any(String),
+            comment_count: expect.any(String),
+          });
+        });
+      });
+  });
+  test("200: returns an array of all articles sorted by date, limited to 2 results, offset by 5 ", () => {
+    return request(app)
+      .get("/api/articles?sort_by=article_id&limit=2&p=3")
+      .expect(200)
+      .then(({ body }) => {
+        const { articles } = body;
+        expect(articles).toHaveLength(2);
+        expect(articles).toBeSortedBy("created_at");
+        expect(articles).toEqual([
+          {
+            author: 'rogersop',
+            title: 'Student SUES Mitch!',
+            article_id: 4,
+            topic: 'mitch',
+            created_at: "2020-05-06T01:14:00.000Z",
+            article_img_url: 'https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700',
+            votes: 0,
+            comment_count: '0'
+          },
+          {
+            author: 'rogersop',
+            title: 'UNCOVERED: catspiracy to bring down democracy',
+            article_id: 5,
+            topic: 'cats',
+            created_at: "2020-08-03T13:14:00.000Z",
+            article_img_url: 'https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700',
+            votes: 0,
+            comment_count: '2'
+          }
+        ])
+      });
+  });
   test("404: returns an error when searching for an invalid endpoint", () => {
     return request(app)
       .get("/api/articles?topic=cat")
@@ -246,13 +300,13 @@ describe("GET /api/articles", () => {
 });
 
 describe("GET /api/articles/:article_id/comments", () => {
-  test("200: returns an array of all comments related to a particular article, sorted by date", () => {
+  test("200: returns an array of all comments related to a particular article, sorted by date, limited to 10 by default", () => {
     return request(app)
       .get("/api/articles/1/comments")
       .expect(200)
       .then(({ body }) => {
         const { comments } = body;
-        expect(comments).toHaveLength(11);
+        expect(comments).toHaveLength(10);
         expect(comments).toBeSortedBy("created_at");
         comments.forEach((obj) => {
           expect(obj).toMatchObject({
@@ -264,6 +318,54 @@ describe("GET /api/articles/:article_id/comments", () => {
             comment_id: expect.any(Number),
           });
         });
+      });
+  });
+  test("200: returns an array of all comments related to a particular article, sorted by date, limited to 5", () => {
+    return request(app)
+      .get("/api/articles/1/comments?limit=5")
+      .expect(200)
+      .then(({ body }) => {
+        const { comments } = body;
+        expect(comments).toHaveLength(5);
+        expect(comments).toBeSortedBy("created_at");
+        comments.forEach((obj) => {
+          expect(obj).toMatchObject({
+            author: expect.any(String),
+            article_id: 1,
+            body: expect.any(String),
+            created_at: expect.any(String),
+            votes: expect.any(Number),
+            comment_id: expect.any(Number),
+          });
+        });
+      });
+  });
+  test("200: returns an array of all comments related to a particular article, sorted by date, limited to 2, starting at comment 5", () => {
+    return request(app)
+      .get("/api/articles/1/comments?limit=2&p=5")
+      .expect(200)
+      .then(({ body }) => {
+        const { comments } = body;
+        expect(comments).toHaveLength(2);
+        expect(comments).toBeSortedBy("created_at");
+        expect(comments).toEqual([
+          {
+            comment_id: 8,
+            body: 'Delicious crackerbreads',
+            article_id: 1,
+            author: 'icellusedkars',
+            votes: 0,
+            created_at: "2020-04-14T20:19:00.000Z"
+          },
+          {
+            comment_id: 7,
+            body: 'Lobster pot',
+            article_id: 1,
+            author: 'icellusedkars',
+            votes: 0,
+            created_at: "2020-05-15T20:19:00.000Z"
+          }
+        ])
       });
   });
   test("200: returns 200 if making request for article that exists but has no comments", () => {
@@ -349,7 +451,7 @@ describe("POST /api/articles/:article_id/comments", () => {
       .expect(400)
       .then(({ body }) => {
         const { msg } = body;
-        expect(msg).toBe("incomplete new comment");
+        expect(msg).toBe("incomplete entry");
       });
   });
   test("400: throws an error when the author is invalid and not in database", () => {
@@ -606,6 +708,118 @@ describe("DELETE /api/articles/:article_id", () => {
   test("400: throws an error when there is a bad request in path", () => {
     return request(app)
       .delete("/api/articles/hello")
+      .expect(400)
+      .then(({ body }) => {
+        const { msg } = body;
+        expect(msg).toBe("bad request");
+      });
+  });
+});
+
+describe("POST /api/topics", () => {
+  test("201: Allows a user to add a topic ", () => {
+    const newTopic = {
+      slug: "topic name here",
+      description: "description here"
+    };
+    return request(app)
+      .post("/api/topics")
+      .send(newTopic)
+      .expect(201)
+      .then(({ body }) => {
+        expect(body.topic).toEqual(
+          expect.objectContaining({
+              slug: "topic name here",
+              description: "description here"
+          })
+        );
+      });
+  });
+});
+
+describe("POST /api/articles", () => {
+  test("201: Allows a user to add a new article with article_img_url included already", () => {
+    const newArticle = {
+      author: "rogersop",
+      title: "example title",
+      body: "example body",
+      topic: "mitch",
+      article_img_url: "http/example/article/img/url/22621565"
+    };
+    return request(app)
+      .post("/api/articles")
+      .send(newArticle)
+      .expect(201)
+      .then(({ body }) => {
+        expect(body.article).toEqual(
+          expect.objectContaining({
+            author: "rogersop",
+            title: "example title",
+            body: "example body",
+            topic: "mitch",
+            article_img_url: "http/example/article/img/url/22621565",
+            article_id: expect.any(Number),
+            votes: 0,
+            created_at: expect.any(String),
+          })
+        );
+      });
+  });
+  test("201: Allows a user to add a new article with article_img_url not included", () => {
+    const newArticle = {
+      author: "rogersop",
+      title: "example title",
+      body: "example body",
+      topic: "mitch",
+      article_img_url: null
+    };
+    return request(app)
+      .post("/api/articles")
+      .send(newArticle)
+      .expect(201)
+      .then(({ body }) => {
+        expect(body.article).toEqual(
+          expect.objectContaining({
+            author: "rogersop",
+            title: "example title",
+            body: "example body",
+            topic: "mitch",
+            article_img_url: null,
+            article_id: expect.any(Number),
+            votes: 0,
+            created_at: expect.any(String),
+          })
+        );
+      });
+  });
+  test("400: throws an error when trying to post incomplete new article", () => {
+    const newArticle = {
+      author: "rogersop",
+      title: null,
+      body: "example body",
+      topic: "mitch",
+      article_img_url: "http/example/article/img/url/22621565"
+    };
+    return request(app)
+      .post("/api/articles")
+      .send(newArticle)
+      .expect(400)
+      .then(({ body }) => {
+        const { msg } = body;
+        expect(msg).toBe("incomplete entry");
+      });
+  });
+  test("400: throws an error when the author is invalid and not in database", () => {
+    const newArticle = {
+      author: "author not in database",
+      title: "example title",
+      body: "example body",
+      topic: "mitch",
+      article_img_url: "http/example/article/img/url/22621565"
+    };
+    return request(app)
+      .post("/api/articles")
+      .send(newArticle)
       .expect(400)
       .then(({ body }) => {
         const { msg } = body;

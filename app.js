@@ -1,6 +1,6 @@
 const express = require("express");
 const { getApi } = require("./controllers/api.controller");
-const { getTopicsCon } = require("./controllers/topics.controller");
+const { getTopicsCon, postTopicsCon } = require("./controllers/topics.controller");
 const {
   getArticlesByIDCon,
   getArticlesCon,
@@ -10,6 +10,7 @@ const {
   deleteCommentCon,
   updateCommentsCon,
   deleteArticleCon,
+  postArticlesCon,
 } = require("./controllers/articles.controller");
 const {
   getUsersCon,
@@ -43,9 +44,13 @@ app.patch("/api/comments/:comment_id", updateCommentsCon);
 
 app.delete("/api/articles/:article_id", deleteArticleCon);
 
+app.post("/api/topics", postTopicsCon);
+
+app.post("/api/articles", postArticlesCon);
+
 app.use((err, req, res, next) => {
   if (err.code === "23502") {
-    res.status(400).send({ msg: "incomplete new comment" });
+    res.status(400).send({ msg: "incomplete entry" });
   }
   if (err.code === "22P02" || err.code === "23503") {
     res.status(400).send({ msg: "bad request" });

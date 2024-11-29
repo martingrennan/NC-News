@@ -7,7 +7,8 @@ const { getArticlesByIDMod,
         updateVotesMod,
         deleteCommentMod, 
         updateCommentsMod,
-        deleteArticleMod} = require("../models/articles.model.js");
+        deleteArticleMod,
+        postArticlesMod} = require("../models/articles.model.js");
 
 exports.getArticlesByIDCon = (req, res, next) => {
     const {article_id} = req.params
@@ -18,8 +19,8 @@ exports.getArticlesByIDCon = (req, res, next) => {
 }
 
 exports.getArticlesCon = (req, res, next) => {
-    const {sort_by, order, topic} = req.query
-    getArticlesMod(sort_by, order, topic).then((articles) => {
+    const {sort_by, order, topic, limit, p} = req.query
+    getArticlesMod(sort_by, order, topic, limit, p).then((articles) => {
         res.status(200).send({articles})
     })
     .catch((next))
@@ -27,7 +28,8 @@ exports.getArticlesCon = (req, res, next) => {
 
 exports.getCommentsCon = (req, res, next) => {
     const {article_id} = req.params
-    const promises = [getCommentsMod(article_id)]
+    const {limit, p} = req.query
+    const promises = [getCommentsMod(article_id, limit, p)]
     
     if (article_id){
         promises.push(checkArticleExists(article_id))
@@ -109,6 +111,14 @@ exports.deleteArticleCon = (req, res, next) => {
     deleteArticleMod(endpoint)
     .then(() => {
         res.status(204).send()
+    })
+    .catch((next))
+}
+
+exports.postArticlesCon = (req, res, next) => {
+    const article = req.body
+    postArticlesMod(article).then((article) => {
+        res.status(201).send({article})
     })
     .catch((next))
 }

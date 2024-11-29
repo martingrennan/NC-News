@@ -1,4 +1,4 @@
-const { getTopicsMod } = require('../models/topics.model')
+const { getTopicsMod, postTopicsMod } = require('../models/topics.model')
 
 exports.getTopicsCon = (req, res, next) => {
     getTopicsMod().then((topics) => {
@@ -7,4 +7,10 @@ exports.getTopicsCon = (req, res, next) => {
     .catch((next))
 }
 
-
+exports.postTopicsCon = (req, res, next) => {
+    const topic = req.body
+    postTopicsMod(topic).then((topic) => {
+        res.status(201).send({topic})
+    })
+    .catch((next))
+}

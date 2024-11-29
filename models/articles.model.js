@@ -23,7 +23,7 @@ exports.getArticlesByIDMod = (article_id) => {
   });
 };
 
-exports.getArticlesMod = (sort_by = "created_at", order, topic) => {
+exports.getArticlesMod = (sort_by = "created_at", order, topic, limit = 10, p = 0) => {
   const validSortBy = [
     "author",
     "title",
@@ -65,6 +65,8 @@ exports.getArticlesMod = (sort_by = "created_at", order, topic) => {
     sqlQuery += ` ORDER BY ${sort_by} ${order}`;
   }
 
+  sqlQuery += ` LIMIT ${limit} OFFSET ${p} `
+
   return db.query(sqlQuery, queryValues).then(({ rows }) => {
     if (rows.length === 0) {
       throw { status: 404, msg: "Article not found" };
@@ -73,7 +75,7 @@ exports.getArticlesMod = (sort_by = "created_at", order, topic) => {
   });
 };
 
-exports.getCommentsMod = (article_id) => {
+exports.getCommentsMod = (article_id, limit = 10, p = 0) => {
   let sqlQuery = `SELECT *
     FROM comments `;
   const queryValues = [];
@@ -83,7 +85,8 @@ exports.getCommentsMod = (article_id) => {
     queryValues.push(article_id);
   }
 
-  sqlQuery += ` ORDER BY created_at ASC`;
+  sqlQuery += ` ORDER BY created_at ASC
+                LIMIT ${limit} OFFSET ${p}`;
 
   return db.query(sqlQuery, queryValues).then(({ rows }) => {
     return rows;
@@ -92,7 +95,6 @@ exports.getCommentsMod = (article_id) => {
 
 exports.postCommentsMod = (comment, endpoint) => {
   const { author, body } = comment;
-  const id = Number(endpoint);
 
   return db
     .query(
@@ -100,7 +102,7 @@ exports.postCommentsMod = (comment, endpoint) => {
       (article_id, author, body) 
       VALUES ($1, $2, $3) 
       RETURNING *`,
-      [id, author, body]
+      [endpoint, author, body]
     )
     .then(({ rows }) => {
       return rows[0];
@@ -203,3 +205,19 @@ exports.deleteArticleMod = (endpoint) => {
       }
     });
 };
+
+exports.postArticlesMod = (articles) => {
+  const { author, title, body, topic, article_img_url } = articles;
+
+  return db
+  .query(
+    `INSERT INTO articles
+    (author, title, body, topic, article_img_url) 
+    VALUES ($1, $2, $3, $4, $5) 
+    RETURNING *`,
+    [author, title, body, topic, article_img_url]
+  )
+  .then(({ rows }) => {
+    return rows[0];
+  });
+}
